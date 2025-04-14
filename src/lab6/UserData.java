@@ -34,6 +34,11 @@ public class UserData {
 	public String getPassword() {
 		return password;
 	}
+	
+	public int getAccountNum()
+	{
+		return accountNum;
+	}
 
 	public void setPassword(String password) {
 		this.password = password;
