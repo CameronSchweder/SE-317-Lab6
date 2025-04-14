@@ -83,6 +83,7 @@ public class ATMSim {
 			case 1: {
 				System.out.println("Checking Account Balance: $" + checking.getBalance());
 			}
+			break;
 			// Deposit money in Checking
 			case 2: {
 				System.out.print("Enter amount to deposit to Checking: ");
