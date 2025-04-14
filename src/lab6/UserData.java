@@ -6,17 +6,19 @@ public class UserData {
 	private CheckingAccount checking;
 	private SavingsAccount savings;
 	private UtilityCompany utility;
+	private int accountNum;
 
 	public UserData() {
 	}
 
 	public UserData(String username, String password, CheckingAccount checking, SavingsAccount savings,
-			UtilityCompany utility) {
+			UtilityCompany utility, int accountNum) {
 		this.username = username;
 		this.password = password;
 		this.checking = checking;
 		this.savings = savings;
 		this.utility = utility;
+		this.accountNum = accountNum;
 	}
 
 	// Getters and Setters
