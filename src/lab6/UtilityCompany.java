@@ -71,4 +71,13 @@ public class UtilityCompany {
     public String getDueDate() {
         return dueDate;
     }
+    
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+    
+    public void setNextBillAmount(double nextBillAmount) {
+        this.nextBillAmount = nextBillAmount;
+    }
 }

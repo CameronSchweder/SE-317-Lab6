@@ -8,9 +8,7 @@ public class ATMSim {
 		Scanner scanner = new Scanner(System.in);
 		boolean login = true;
 		UserManager userManager = new UserManager();
-		UtilityCompany utility = null;
-		CheckingAccount checking = new CheckingAccount(0);
-        SavingsAccount savings = new SavingsAccount(0);
+		UserData currentUser = null;
 
 
 		System.out.println("Please choose one of the options below");
@@ -28,8 +26,14 @@ public class ATMSim {
 				System.out.println("Password: ");
 				String password = scanner.next();
 
-				utility = new UtilityCompany(username, password);
-	            userManager.addUser(utility); // Saves to file
+				 UtilityCompany utility = new UtilityCompany(username, password);
+				    CheckingAccount checking = new CheckingAccount(0);
+				    SavingsAccount savings = new SavingsAccount(0);
+
+				    int accountNum = utility.getAccountNumber();
+				    currentUser = new UserData(username, password, checking, savings, utility, accountNum);
+
+				    userManager.addUser(currentUser);
 				System.out.println("Thanks for signing up, here is your Account Number: " + utility.getAccountNumber());
 
 				login = false;
@@ -44,13 +48,13 @@ public class ATMSim {
 					System.out.println("Password: ");
 					String password = scanner.next();
 
-					utility = new UtilityCompany(username, password, accountNum);
-
-					if (scanner.nextInt() == 0) { // utilAccount.userLogin(username, password)
-						login = false;
-					} else {
-						System.out.println("Please enter a valid Username and Password");
-					}
+					if (userManager.authenticate(username, password)) {
+			            currentUser = userManager.getUser(username);
+			            System.out.println("Login successful!");
+			            login = false;
+                    } else {
+                        System.out.println("Invalid username or password.");
+                    }
 				}
 			}
 			if (num == 3) {
@@ -84,14 +88,14 @@ public class ATMSim {
 			switch (choice) {
 			// Account Balance
 			case 1: {
-				System.out.println("Checking Account Balance: $" + checking.getBalance());
+				System.out.println("Checking Account Balance: $" + currentUser.getChecking().getBalance());
 			}
 			break;
 			// Deposit money in Checking
 			case 2: {
 				System.out.print("Enter amount to deposit to Checking: ");
 				double amount = scanner.nextDouble();
-				if (checking.deposit(amount)) {
+				if (currentUser.getChecking().deposit(amount)) {
 					System.out.println("Deposit successful.");
 				} else {
 					System.out.println("Deposit failed. Limit exceeded or invalid amount.");
@@ -103,7 +107,7 @@ public class ATMSim {
 			case 3: {
 				System.out.print("Enter amount to withdraw from Checking: ");
 				double amount = scanner.nextDouble();
-				if (checking.withdraw(amount)) {
+				if (currentUser.getChecking().withdraw(amount)) {
 					System.out.println("Withdrawal successful.");
 				} else {
 					System.out.println("Withdrawal failed. Limit exceeded or insufficient funds.");
@@ -115,7 +119,7 @@ public class ATMSim {
 			case 4: {
 				System.out.print("Enter amount to transfer to Saving: ");
 				double amount = scanner.nextDouble();
-				if (checking.withdraw(amount) && savings.deposit(amount)) {
+				if (currentUser.getChecking().withdraw(amount) && currentUser.getSavings().deposit(amount)) {
 					System.out.println("Transfer successful.");
 				} else {
 					System.out.println("Transfer failed.");
@@ -125,7 +129,7 @@ public class ATMSim {
 
 			// Getting savings Balance
 			case 5: {
-				System.out.println("Saving balance: $" + savings.getBalance());
+				System.out.println("Saving balance: $" + currentUser.getSavings().getBalance());
 				break;
 			}
 
@@ -133,7 +137,7 @@ public class ATMSim {
 			case 6: {
 				System.out.print("Enter amount to deposit to Saving: ");
 				double amount = scanner.nextDouble();
-				if (savings.deposit(amount)) {
+				if (currentUser.getSavings().deposit(amount)) {
 					System.out.println("Deposit successful.");
 				} else {
 					System.out.println("Deposit failed. Limit exceeded or invalid amount.");
@@ -145,7 +149,7 @@ public class ATMSim {
 			case 7: {
 				System.out.print("Enter amount to transfer to Checking: ");
 				double amount = scanner.nextDouble();
-				if (savings.transferToChecking(checking, amount)) {
+				if (currentUser.getSavings().transferToChecking(currentUser.getChecking(), amount)) {
 					System.out.println("Transfer successful.");
 				} else {
 					System.out.println("Transfer failed2. Limit exceeded or insufficient funds.");
@@ -155,10 +159,10 @@ public class ATMSim {
 
 			// Paying next bill
 			case 8: {
-				double billAmount = utility.getNextBillAmount();
-				System.out.println("Paying bill of $" + billAmount + " due on " + utility.getDueDate());
-				if (checking.withdraw(billAmount)) {
-					utility.addBillPayment(billAmount);
+				double billAmount = currentUser.getUtility().getNextBillAmount();
+				System.out.println("Paying bill of $" + billAmount + " due on " + currentUser.getUtility().getDueDate());
+				if (currentUser.getChecking().withdraw(billAmount)) {
+					currentUser.getUtility().addBillPayment(billAmount);
 					System.out.println("Payment successful.");
 				} else {
 					System.out.println("Payment failed. Not enough balance.");
@@ -169,7 +173,7 @@ public class ATMSim {
 			// Finding Bill History
 			case 9: {
 				System.out.println("Util1ity Bill History:");
-				for (String record : utility.getBillHistory()) {
+				for (String record : currentUser.getUtility().getBillHistory()) {
 					System.out.println(record);
 				}
 				break;
@@ -177,13 +181,13 @@ public class ATMSim {
 
 			// Finding next Bill
 			case 10: {
-				System.out.println("Next Bill Amount: $" + utility.getNextBillAmount());
-				System.out.println("Due Date: " + utility.getDueDate());
+				System.out.println("Next Bill Amount: $" + currentUser.getUtility().getNextBillAmount());
+				System.out.println("Due Date: " + currentUser.getUtility().getDueDate());
 				break;
 			}
 			// Exiting
 			case 11: {
-                userManager.addUser(utility); // Save any final updates
+                userManager.addUser(currentUser); // Save any final updates
 				running = false;
 				System.out.println("Thank you for using the ATM!");
 				break;
