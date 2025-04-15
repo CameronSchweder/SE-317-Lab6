@@ -1,0 +1,2 @@
+username,password,accountNumber,nextBillAmount,dueDate,bill1,bill2,bill3
+JohnDoe,pass123,123456,85.0,2025-05-15,Paid $50.00 on 2025-04-10,Paid $70.00 on 2025-03-10,Paid $60.00 on 2025-02-10

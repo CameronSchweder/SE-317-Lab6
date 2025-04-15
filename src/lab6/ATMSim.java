@@ -4,195 +4,178 @@ import java.util.Scanner;
 
 public class ATMSim {
 
-	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
-		boolean login = true;
-		UserManager userManager = new UserManager();
-		UtilityCompany utility = null;
-		CheckingAccount checking = new CheckingAccount(0);
-        SavingsAccount savings = new SavingsAccount(0);
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        BankDataManager dataManager = new BankDataManager();
+        UserManager userManager = new UserManager();
 
+        boolean login = true;
+        UtilityCompany utility = null;
+        CheckingAccount checking = null;
+        SavingsAccount savings = null;
 
-		System.out.println("Please choose one of the options below");
-		System.out.println("1. Sign Up");
-		System.out.println("2. Login");
-		System.out.println("3. Exit");
+        System.out.println("Please choose one of the options below");
+        System.out.println("1. Sign Up");
+        System.out.println("2. Login");
+        System.out.println("3. Exit");
 
-		// Login and Signup Process
-		while (login) {
-			int num = scanner.nextInt();
-			if (num == 1) {
-				System.out.println("Great, Please Enter the following:");
-				System.out.println("Username:");
-				String username = scanner.next();
-				System.out.println("Password: ");
-				String password = scanner.next();
+        while (login) {
+            int num = scanner.nextInt();
+            scanner.nextLine(); // Clear newline
 
-				utility = new UtilityCompany(username, password);
-	            userManager.addUser(utility); // Saves to file
-				System.out.println("Thanks for signing up, here is your Account Number: " + utility.getAccountNumber());
+            if (num == 1) {
+                System.out.println("Great, Please Enter the following:");
+                System.out.print("Username: ");
+                String username = scanner.nextLine();
+                System.out.print("Password: ");
+                String password = scanner.nextLine();
 
-				login = false;
-			}
-			if (num == 2) {
-				System.out.println("Great, Please Enter your Username and Password Below:");
-				while (login) {
-					System.out.println("Username:");
-					String username = scanner.next();
-					System.out.println("Account Number:");
-					int accountNum = scanner.nextInt();
-					System.out.println("Password: ");
-					String password = scanner.next();
+                utility = new UtilityCompany(username, password);
+                checking = new CheckingAccount(0);
+                savings = new SavingsAccount(0);
 
-					utility = new UtilityCompany(username, password, accountNum);
+                // Save user and account data
+                userManager.addUser(utility);
+                dataManager.saveAccounts(username, checking, savings);
 
-					if (scanner.nextInt() == 0) { // utilAccount.userLogin(username, password)
-						login = false;
-					} else {
-						System.out.println("Please enter a valid Username and Password");
-					}
-				}
-			}
-			if (num == 3) {
-				System.out.println("Exiting");
-				return;
-			} else {
-				System.out.println("please enter a valid opiton");
-			}
-		}
-		boolean running = true;
-		while (running) {
-			System.out.println("\n===== ATM Menu =====");
-			System.out.println("1. View Checking Balance");
-			System.out.println("2. Deposit to Checking");
-			System.out.println("3. Withdraw from Checking");
-			System.out.println("4. Transfer from Checking to Saving");
+                System.out.println("Thanks for signing up, here is your Account Number: " + utility.getAccountNumber());
+                login = false;
 
-			System.out.println("5. View Saving Balance");
-			System.out.println("6. Deposit to Saving");
-			System.out.println("7. Transfer from Saving to Checking");
+            } else if (num == 2) {
+                System.out.println("Great, Please Enter your Username and Password Below:");
+                while (login) {
+                    System.out.print("Username: ");
+                    String username = scanner.nextLine();
+                    System.out.print("Account Number: ");
+                    int accountNum = scanner.nextInt();
+                    scanner.nextLine(); // clear newline
+                    System.out.print("Password: ");
+                    String password = scanner.nextLine();
 
-			System.out.println("8. Pay Utility Bill");
-			System.out.println("9. View Utility Bill History");
-			System.out.println("10. View Next Utility Bill");
+                    utility = new UtilityCompany(username, password, accountNum);
 
-			System.out.println("11. Exit");
-			System.out.print("Choose an option: ");
+                    if (userManager.login(username, password)) {
+                        checking = dataManager.loadCheckingAccount(username);
+                        savings = dataManager.loadSavingsAccount(username);
+                        if (checking == null) checking = new CheckingAccount(0);
+                        if (savings == null) savings = new SavingsAccount(0);
+                        login = false;
+                    } else {
+                        System.out.println("Invalid login. Try again.");
+                    }
+                }
 
-			int choice = scanner.nextInt();
+            } else if (num == 3) {
+                System.out.println("Exiting...");
+                return;
+            } else {
+                System.out.println("Please enter a valid option.");
+            }
+        }
 
-			switch (choice) {
-			// Account Balance
-			case 1: {
-				System.out.println("Checking Account Balance: $" + checking.getBalance());
-			}
-			break;
-			// Deposit money in Checking
-			case 2: {
-				System.out.print("Enter amount to deposit to Checking: ");
-				double amount = scanner.nextDouble();
-				if (checking.deposit(amount)) {
-					System.out.println("Deposit successful.");
-				} else {
-					System.out.println("Deposit failed. Limit exceeded or invalid amount.");
-				}
-				break;
-			}
+        boolean running = true;
+        while (running) {
+            System.out.println("\n===== ATM Menu =====");
+            System.out.println("1. View Checking Balance");
+            System.out.println("2. Deposit to Checking");
+            System.out.println("3. Withdraw from Checking");
+            System.out.println("4. Transfer from Checking to Saving");
 
-			// Withdraw in Checking
-			case 3: {
-				System.out.print("Enter amount to withdraw from Checking: ");
-				double amount = scanner.nextDouble();
-				if (checking.withdraw(amount)) {
-					System.out.println("Withdrawal successful.");
-				} else {
-					System.out.println("Withdrawal failed. Limit exceeded or insufficient funds.");
-				}
-				break;
-			}
+            System.out.println("5. View Saving Balance");
+            System.out.println("6. Deposit to Saving");
+            System.out.println("7. Transfer from Saving to Checking");
 
-			// Transfer money from Checking to Savings
-			case 4: {
-				System.out.print("Enter amount to transfer to Saving: ");
-				double amount = scanner.nextDouble();
-				if (checking.withdraw(amount) && savings.deposit(amount)) {
-					System.out.println("Transfer successful.");
-				} else {
-					System.out.println("Transfer failed.");
-				}
-				break;
-			}
+            System.out.println("8. Pay Utility Bill");
+            System.out.println("9. View Utility Bill History");
+            System.out.println("10. View Next Utility Bill");
 
-			// Getting savings Balance
-			case 5: {
-				System.out.println("Saving balance: $" + savings.getBalance());
-				break;
-			}
+            System.out.println("11. Exit");
+            System.out.print("Choose an option: ");
 
-			// Depositing money to Savings
-			case 6: {
-				System.out.print("Enter amount to deposit to Saving: ");
-				double amount = scanner.nextDouble();
-				if (savings.deposit(amount)) {
-					System.out.println("Deposit successful.");
-				} else {
-					System.out.println("Deposit failed. Limit exceeded or invalid amount.");
-				}
-				break;
-			}
+            int choice = scanner.nextInt();
 
-			// Transferring money from Savings to checking
-			case 7: {
-				System.out.print("Enter amount to transfer to Checking: ");
-				double amount = scanner.nextDouble();
-				if (savings.transferToChecking(checking, amount)) {
-					System.out.println("Transfer successful.");
-				} else {
-					System.out.println("Transfer failed2. Limit exceeded or insufficient funds.");
-				}
-				break;
-			}
-
-			// Paying next bill
-			case 8: {
-				double billAmount = utility.getNextBillAmount();
-				System.out.println("Paying bill of $" + billAmount + " due on " + utility.getDueDate());
-				if (checking.withdraw(billAmount)) {
-					utility.addBillPayment(billAmount);
-					System.out.println("Payment successful.");
-				} else {
-					System.out.println("Payment failed. Not enough balance.");
-				}
-				break;
-			}
-
-			// Finding Bill History
-			case 9: {
-				System.out.println("Util1ity Bill History:");
-				for (String record : utility.getBillHistory()) {
-					System.out.println(record);
-				}
-				break;
-			}
-
-			// Finding next Bill
-			case 10: {
-				System.out.println("Next Bill Amount: $" + utility.getNextBillAmount());
-				System.out.println("Due Date: " + utility.getDueDate());
-				break;
-			}
-			// Exiting
-			case 11: {
-                userManager.addUser(utility); // Save any final updates
-				running = false;
-				System.out.println("Thank you for using the ATM!");
-				break;
-			}
-			default: {
-				System.out.println("Invalid option. Please try again.");
-			}
-			}
-
-		}
-	}
+            switch (choice) {
+                case 1:
+                    System.out.println("Checking Account Balance: $" + checking.getBalance());
+                    break;
+                case 2:
+                    System.out.print("Enter amount to deposit to Checking: ");
+                    double deposit = scanner.nextDouble();
+                    if (checking.deposit(deposit)) {
+                        System.out.println("Deposit successful.");
+                    } else {
+                        System.out.println("Deposit failed. Limit exceeded or invalid amount.");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter amount to withdraw from Checking: ");
+                    double withdraw = scanner.nextDouble();
+                    if (checking.withdraw(withdraw)) {
+                        System.out.println("Withdrawal successful.");
+                    } else {
+                        System.out.println("Withdrawal failed. Limit exceeded or insufficient funds.");
+                    }
+                    break;
+                case 4:
+                    System.out.print("Enter amount to transfer to Saving: ");
+                    double toSaving = scanner.nextDouble();
+                    if (checking.transferToSavings(savings, toSaving)) {
+                        System.out.println("Transfer successful.");
+                    } else {
+                        System.out.println("Transfer failed.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Saving balance: $" + savings.getBalance());
+                    break;
+                case 6:
+                    System.out.print("Enter amount to deposit to Saving: ");
+                    double saveDeposit = scanner.nextDouble();
+                    if (savings.deposit(saveDeposit)) {
+                        System.out.println("Deposit successful.");
+                    } else {
+                        System.out.println("Deposit failed. Limit exceeded or invalid amount.");
+                    }
+                    break;
+                case 7:
+                    System.out.print("Enter amount to transfer to Checking: ");
+                    double toChecking = scanner.nextDouble();
+                    if (savings.transferToChecking(checking, toChecking)) {
+                        System.out.println("Transfer successful.");
+                    } else {
+                        System.out.println("Transfer failed. Limit exceeded or insufficient funds.");
+                    }
+                    break;
+                case 8:
+                    double billAmount = utility.getNextBillAmount();
+                    System.out.println("Paying bill of $" + billAmount + " due on " + utility.getDueDate());
+                    if (checking.withdraw(billAmount)) {
+                        utility.addBillPayment(billAmount);
+                        System.out.println("Payment successful.");
+                    } else {
+                        System.out.println("Payment failed. Not enough balance.");
+                    }
+                    break;
+                case 9:
+                    System.out.println("Utility Bill History:");
+                    for (String record : utility.getBillHistory()) {
+                        System.out.println(record);
+                    }
+                    break;
+                case 10:
+                    System.out.println("Next Bill Amount: $" + utility.getNextBillAmount());
+                    System.out.println("Due Date: " + utility.getDueDate());
+                    break;
+                case 11:
+                    userManager.addUser(utility);
+                    dataManager.saveAccounts(utility.getUsername(), checking, savings);
+                    System.out.println("Thank you for using the ATM!");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+        scanner.close();
+    }
 }

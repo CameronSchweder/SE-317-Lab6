@@ -7,6 +7,7 @@ public class SavingsAccount {
 	private double balance;
 	private double dailyDepositTotal = 0;
 	private double dailyTransferTotal = 0;
+	private String username;
 	
 	public SavingsAccount(double balance) {
 		if (balance < 0) {
@@ -59,6 +60,14 @@ public class SavingsAccount {
 	public void resetDailyLimits() {
 		dailyDepositTotal = 0;
 		dailyTransferTotal = 0;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }
 

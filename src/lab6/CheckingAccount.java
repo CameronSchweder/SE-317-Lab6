@@ -7,6 +7,7 @@ public class CheckingAccount {
 	private double balance;
 	private double dailyDepositTotal = 0;
 	private double dailyWithdrawTotal = 0;
+	private String username;
 	
 	public CheckingAccount(double balance) {
 		if (balance < 0) {
@@ -66,5 +67,13 @@ public class CheckingAccount {
 	public void resetDailyLimits() {
 		dailyDepositTotal = 0;
 		dailyWithdrawTotal = 0;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }
