@@ -1,0 +1,49 @@
+This project simulates a user banking system that includes:
+
+    - Checking and Savings account management
+
+    - Utility bill tracking
+
+    - User authentication
+
+    - Persistent file-based data storage (via users.txt)
+
+Users can be created, retrieved, authenticated, and stored.
+
+--------------------------------------------------------------------
+
+To Compile and Run from Terminal:
+ - Unzip project
+ - Import into Eclipse (File -> Import -> Existing Projects into Workspace -> Select Archive File -> Finish)
+ - Run ATMSim.java
+ 
+ --------------------------------------------------------------------
+ 
+ To Use Assignment:
+  - You will be asked to either login, sign up, or exit
+  
+  - When signing up, you'll be asked to create a username and password. An account number will be given to you. Write it down, and if you 
+    forget it, the account number should be the third value for your account in users.txt
+    
+  - When logging in, you'll be asked to enter your username, account number, and password.
+  
+  - Once you have logged in, you will be prompted with this menu and 11 different options:
+	  ===== ATM Menu =====
+	1. View Checking Balance
+	2. Deposit to Checking
+	3. Withdraw from Checking
+	4. Transfer from Checking to Saving
+	5. View Saving Balance
+	6. Deposit to Saving
+	7. Transfer from Saving to Checking
+	8. Pay Utility Bill
+	9. View Utility Bill History
+	10. View Next Utility Bill
+	11. Exit
+	Choose an option: 
+	
+
+	- Choose the option that would like to do. Once you have completed this option, it will take you back to the ATM menu. Type 11 whenever
+	  you'd like to exit.
+ 
+
