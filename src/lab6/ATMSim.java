@@ -61,7 +61,7 @@ public class ATMSim {
 				System.out.println("Exiting");
 				return;
 			} else {
-				System.out.println("please enter a valid opiton");
+				System.out.println("Please enter a valid opiton");
 			}
 		}
 		boolean running = true;
@@ -152,7 +152,7 @@ public class ATMSim {
 				if (currentUser.getSavings().transferToChecking(currentUser.getChecking(), amount)) {
 					System.out.println("Transfer successful.");
 				} else {
-					System.out.println("Transfer failed2. Limit exceeded or insufficient funds.");
+					System.out.println("Transfer failed. Limit exceeded or insufficient funds.");
 				}
 				break;
 			}
@@ -172,7 +172,7 @@ public class ATMSim {
 
 			// Finding Bill History
 			case 9: {
-				System.out.println("Util1ity Bill History:");
+				System.out.println("Utility Bill History:");
 				for (String record : currentUser.getUtility().getBillHistory()) {
 					System.out.println(record);
 				}
