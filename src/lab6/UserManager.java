@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 public class UserManager {
+	// hi
     private static final String FILE_NAME = "users.json";
     private HashMap<String, UtilityCompany> users;
 
