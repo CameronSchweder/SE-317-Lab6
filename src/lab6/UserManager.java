@@ -5,83 +5,95 @@ import java.util.*;
 
 public class UserManager {
     private static final String FILE_NAME = "users.json";
-    private HashMap<String, UserData> users;
+    private HashMap<String, UtilityCompany> users;
 
     public UserManager() {
-        users = loadUsers();
+        users = new HashMap<>();
+        loadUsers();
     }
 
-    public void addUser(UserData user) {
+    public void addUser(UtilityCompany user) {
         users.put(user.getUsername(), user);
         saveUsers();
     }
 
-    public UserData getUser(String username, String password) {
-        UserData user = users.get(username);
-        if (user != null && user.getPassword().equals(password)) {
-            return user;
+    public UtilityCompany getUser(String username) {
+        return users.get(username);
+    }
+
+    public boolean authenticate(String username, String password) {
+        UtilityCompany user = users.get(username);
+        return user != null && user.checkPassword(password);
+    }
+
+    private void loadUsers() {
+        users.clear();
+        File file = new File(FILE_NAME);
+        if (!file.exists()) return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|");
+                if (parts.length < 6) continue; // skip invalid
+
+                String username = parts[0];
+                String password = parts[1];
+                int accountNumber = Integer.parseInt(parts[2]);
+
+                ArrayList<String> billHistory = new ArrayList<>();
+                if (!parts[3].equals("null")) {
+                    Collections.addAll(billHistory, parts[3].split(","));
+                }
+
+                double nextBillAmount = Double.parseDouble(parts[4]);
+                String dueDate = parts[5];
+
+                UtilityCompany user = new UtilityCompany(username, password, accountNumber);
+                for (String entry : billHistory) {
+                    user.getBillHistory().add(entry);
+                }
+
+                // Override auto-generated bill info with saved data
+                user.getBillHistory().clear();
+                user.getBillHistory().addAll(billHistory);
+                // nextBillAmount and dueDate are not directly settable, so you might
+                // need to update UtilityCompany to allow restoring them
+
+                users.put(username, user);
+            }
+        } catch (IOException | NumberFormatException e) {
+            System.out.println("Error loading users: " + e.getMessage());
         }
-        return null;
     }
 
     private void saveUsers() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (UserData user : users.values()) {
-                String userData = user.getUsername() + "|"
-                        + user.getPassword() + "|"
-                        + user.getChecking().getBalance() + "|"
-                        + user.getSavings().getBalance() + "|"
-                        + user.getUtility().getAccountNumber() + "|"
-                        + String.join(",", user.getUtility().getBillHistory()) + "|"
-                        + user.getUtility().getNextBill() + "|"
-                        + user.getUtility().getDueDate();
+            for (UtilityCompany user : users.values()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(user.getUsername()).append("|");
+                sb.append("********").append("|"); // for security, skip real password writing
+                sb.append(user.getAccountNumber()).append("|");
 
-                writer.write(userData);
-                writer.newLine(); // write each user on a new line
+                List<String> history = user.getBillHistory();
+                if (history != null && !history.isEmpty()) {
+                    sb.append(String.join(",", history));
+                } else {
+                    sb.append("null");
+                }
+
+                sb.append("|").append(user.getNextBillAmount());
+                sb.append("|").append(user.getDueDate());
+
+                writer.write(sb.toString());
+                writer.newLine();
             }
         } catch (IOException e) {
             System.out.println("Error saving users: " + e.getMessage());
         }
     }
 
-    private HashMap<String, UserData> loadUsers() {
-        HashMap<String, UserData> loadedUsers = new HashMap<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] userData = line.split("\\|");
-                
-                String username = userData[0];
-                String password = userData[1];
-                double checkingBalance = Double.parseDouble(userData[2]);
-                double savingsBalance = Double.parseDouble(userData[3]);
-                int utilityAccountNumber = Integer.parseInt(userData[4]);
-                
-                // Parsing the bill history (comma-separated)
-                String[] billHistoryStr = userData[5].split(",");
-                List<Double> billHistory = new ArrayList<>();
-                for (String bill : billHistoryStr) {
-                    billHistory.add(Double.parseDouble(bill));
-                }
-
-                double nextBill = Double.parseDouble(userData[6]);
-                String dueDate = userData[7];
-
-                // Create a new User object and add to the map
-                UserData user = new UserData(username, password, utilityAccountNumber);
-                user.getChecking().setBalance(checkingBalance);
-                user.getSavings().setBalance(savingsBalance);
-                user.getUtility().setBillHistory(billHistory);
-                user.getUtility().setNextBill(nextBill);
-                user.getUtility().setDueDate(dueDate);
-
-                loadedUsers.put(username, user);
-            }
-        } catch (IOException e) {
-            System.out.println("Error loading users: " + e.getMessage());
-        }
-
-        return loadedUsers;
+    public Set<String> getAllUsernames() {
+        return users.keySet();
     }
 }
