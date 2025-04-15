@@ -7,9 +7,11 @@ public class ATMSim {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		boolean login = true;
-		CheckingAccount checking = new CheckingAccount(0);
-		SavingsAccount savings = new SavingsAccount(0);
+		UserManager userManager = new UserManager();
 		UtilityCompany utility = null;
+		CheckingAccount checking = new CheckingAccount(0);
+        SavingsAccount savings = new SavingsAccount(0);
+
 
 		System.out.println("Please choose one of the options below");
 		System.out.println("1. Sign Up");
@@ -27,6 +29,7 @@ public class ATMSim {
 				String password = scanner.next();
 
 				utility = new UtilityCompany(username, password);
+	            userManager.addUser(utility); // Saves to file
 				System.out.println("Thanks for signing up, here is your Account Number: " + utility.getAccountNumber());
 
 				login = false;
@@ -180,6 +183,7 @@ public class ATMSim {
 			}
 			// Exiting
 			case 11: {
+                userManager.addUser(utility); // Save any final updates
 				running = false;
 				System.out.println("Thank you for using the ATM!");
 				break;

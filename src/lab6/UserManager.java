@@ -4,8 +4,8 @@ import java.io.*;
 import java.util.*;
 
 public class UserManager {
-	// hi
-    private static final String FILE_NAME = "users.json";
+	
+    private static final String FILE_NAME = "users.txt";
     private HashMap<String, UtilityCompany> users;
 
     public UserManager() {
@@ -15,6 +15,7 @@ public class UserManager {
 
     public void addUser(UtilityCompany user) {
         users.put(user.getUsername(), user);
+        System.out.println("hi");
         saveUsers();
     }
 
@@ -70,10 +71,11 @@ public class UserManager {
 
     private void saveUsers() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+        	System.out.println("Saving user: ");
             for (UtilityCompany user : users.values()) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(user.getUsername()).append("|");
-                sb.append("********").append("|"); // for security, skip real password writing
+                sb.append(user.getPassword()).append("|"); // for security, skip real password writing
                 sb.append(user.getAccountNumber()).append("|");
 
                 List<String> history = user.getBillHistory();

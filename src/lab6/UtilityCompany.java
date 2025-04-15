@@ -47,6 +47,10 @@ public class UtilityCompany {
     public String getUsername() {
         return username;
     }
+    
+    public String getPassword() {
+        return password;
+    }
 
     public int getAccountNumber() {
         return accountNumber;
