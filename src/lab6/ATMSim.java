@@ -37,22 +37,35 @@ public class ATMSim {
 				login = false;
 			}
 			if (num == 2) {
-				System.out.println("Great, Please Enter your Username and Password Below:");
-				while (login) {
-					System.out.println("Username:");
-					String username = scanner.next();
-					System.out.println("Account Number:");
-					int accountNum = scanner.nextInt();
-					System.out.println("Password: ");
-					String password = scanner.next();
+				System.out.println("Great, Please Enter your Username, Account Number, and Password:");
 
-					if (userManager.authenticate(username, password)) {
-			            currentUser = userManager.getUser(username);
-			            System.out.println("Login successful!");
-			            login = false;
-                    } else {
-                        System.out.println("Invalid username or password.");
-                    }
+				while (login) {
+				    System.out.print("Username: ");
+				    String username = scanner.next();
+
+				    System.out.print("Account Number: ");
+				    int enteredAccountNum = scanner.nextInt();
+
+				    System.out.print("Password: ");
+				    String password = scanner.next();
+
+				    // fetch the stored user object
+				    UserData user = userManager.getUser(username);
+
+				    // verify username/password first...
+				    if (user != null && userManager.authenticate(username, password)) {
+				        // ...then verify the account number matches
+				        int actualAccountNum = user.getUtility().getAccountNumber();
+				        if (enteredAccountNum == actualAccountNum) {
+				            currentUser = user;
+				            System.out.println("Login successful!");
+				            login = false;
+				        } else {
+				            System.out.println("Invalid account number. Please try again.");
+				        }
+				    } else {
+				        System.out.println("Invalid username or password. Please try again.");
+				    }
 				}
 			}
 			if (num == 3) {
