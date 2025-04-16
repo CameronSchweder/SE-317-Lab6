@@ -5,12 +5,18 @@ import java.util.*;
 
 public class UserManager {
 
-	private static final String FILE_NAME = "users.txt";
+	private String FILE_NAME = "users.txt";
 	private HashMap<String, UserData> users;
 
 	public UserManager() {
 		users = new HashMap<>();
 		loadUsers();
+	}
+	
+	public UserManager(String filePath) {
+	    this.FILE_NAME = filePath;
+	    this.users = new HashMap<>();
+	    loadUsers();
 	}
 
 	public void addUser(UserData user) {
@@ -31,7 +37,7 @@ public class UserManager {
 		return users.keySet();
 	}
 
-	private void loadUsers() {
+	public void loadUsers() {
 		users.clear();
 		File file = new File(FILE_NAME);
 		if (!file.exists())
